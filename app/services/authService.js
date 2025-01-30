@@ -32,4 +32,8 @@ export const authService = {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
   },
+
+  getCurrentUser: () => {
+    return JSON.parse(localStorage.getItem("user"));
+  },
 };
