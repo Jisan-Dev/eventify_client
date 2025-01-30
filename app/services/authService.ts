@@ -1,7 +1,7 @@
-import api from "../utils/api.ts";
+import api from "../utils/api.js";
 
 export const authService = {
-  register: async (userData) => {
+  register: async (userData: any) => {
     const { data } = await api.post("/auth/register", userData);
     if (data?.token) {
       localStorage.setItem("token", data.token);
@@ -10,7 +10,7 @@ export const authService = {
     return data;
   },
 
-  login: async (credentials) => {
+  login: async (credentials: any) => {
     const { data } = await api.post("/auth/login", credentials);
     if (data?.token) {
       localStorage.setItem("token", data.token);
@@ -34,6 +34,6 @@ export const authService = {
   },
 
   getCurrentUser: () => {
-    return JSON.parse(localStorage.getItem("user"));
+    return JSON.parse(localStorage.getItem("user") as string);
   },
 };
