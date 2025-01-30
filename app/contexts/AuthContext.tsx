@@ -1,11 +1,19 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { authService } from "~/services/authService";
 
-const AuthContext = createContext({});
+export const AuthContext = createContext<any>({});
 
 export default function AuthProvider({ children }: any) {
-  const [user, setUser] = useState(authService.getCurrentUser());
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
+  const [user, setUser] = useState({});
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const localUser = JSON.parse(localStorage.getItem("user") as string);
+    if (localUser) {
+      setUser(localUser);
+      setIsAuthenticated(!!authService.getCurrentUser());
+    }
+  }, []);
 
   const login = async (credentials: any) => {
     const userData = await authService.login(credentials);
@@ -30,11 +38,14 @@ export default function AuthProvider({ children }: any) {
 
   const logout = async () => {
     authService.logout();
-    setUser(null);
+    setUser({});
     setIsAuthenticated(false);
   };
 
   return <AuthContext.Provider value={{ user, isAuthenticated, login, register, logout, guestLogin }}>{children}</AuthContext.Provider>;
 }
 
-export const useAuth = useContext(AuthContext);
+export const useAuth = () => {
+  const auth = useContext(AuthContext);
+  return auth;
+};
