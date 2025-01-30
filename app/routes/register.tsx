@@ -1,6 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "~/contexts/AuthContext";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const schema = z.object({
+  username: z.string().min(3).max(50),
+  email: z.string().email(),
+  password: z.string().min(6),
+  confirmPassword: z.string().min(6),
+});
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -20,17 +30,23 @@ export default function Register() {
     });
   };
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
+  const {
+    handleSubmit,
+    register: formReg,
+    formState: { errors },
+  } = useForm({ resolver: zodResolver(schema) });
+
+  const submitHandler = async (data: any) => {
+    // e.preventDefault();
     setError("");
 
-    if (formData.password !== formData.confirmPassword) {
+    if (data.password !== data.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-
+    // console.log(data);
     try {
-      const { confirmPassword, ...registrationData } = formData;
+      const { confirmPassword, ...registrationData } = data;
       console.log(registrationData);
       await register(registrationData);
       navigate("/");
@@ -50,7 +66,7 @@ export default function Register() {
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {error && <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">{error}</div>}
 
-          <form className="space-y-6 text-black" onSubmit={handleSubmit}>
+          <form className="space-y-6 text-black" onSubmit={handleSubmit(submitHandler)}>
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
                 Username
@@ -58,13 +74,14 @@ export default function Register() {
               <div className="mt-1">
                 <input
                   id="username"
-                  name="username"
+                  {...formReg("username")}
                   type="text"
                   required
-                  value={formData.username}
-                  onChange={handleChange}
+                  // value={formData.username}
+                  // onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm "
                 />
+                {errors.username && <div className="text-red-500 text-sm">{errors.username.message as ReactNode}</div>}
               </div>
             </div>
 
@@ -75,13 +92,14 @@ export default function Register() {
               <div className="mt-1">
                 <input
                   id="email"
-                  name="email"
+                  {...formReg("email")}
                   type="email"
                   required
-                  value={formData.email}
-                  onChange={handleChange}
+                  // value={formData.email}
+                  // onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
+                {errors.email && <div className="text-red-500 text-sm">{errors.email.message as ReactNode}</div>}
               </div>
             </div>
 
@@ -92,13 +110,14 @@ export default function Register() {
               <div className="mt-1">
                 <input
                   id="password"
-                  name="password"
+                  {...formReg("password")}
                   type="password"
                   required
-                  value={formData.password}
-                  onChange={handleChange}
+                  // value={formData.password}
+                  // onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
+                {errors.password && <div className="text-red-500 text-sm">{errors.password.message as ReactNode}</div>}
               </div>
             </div>
 
@@ -109,13 +128,14 @@ export default function Register() {
               <div className="mt-1">
                 <input
                   id="confirmPassword"
-                  name="confirmPassword"
+                  {...formReg("confirmPassword")}
                   type="password"
                   required
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
+                  // value={formData.confirmPassword}
+                  // onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
+                {errors.confirmPassword && <div className="text-red-500 text-sm">{errors.confirmPassword.message as ReactNode}</div>}
               </div>
             </div>
 
